@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}
+{{ post.title }}
+{% endblock %}
+{% block content %}
+    <div class="row py-lg-5">
+      <div class="col-lg-6 col-md-8 mx-auto">
+        <h1 class="fw-light">{{ post.title }}</h1>
+        <p class="lead text-muted">
+            {{ post.body|linebreaks }}
+        </p>
+          <p>Published {{ post.publish }} by {{ post.author }}</p>
+            </div>
+    </div>
+{% endblock content %}
+
