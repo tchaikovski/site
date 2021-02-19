@@ -8,6 +8,9 @@
         <h1 class="fw-light">{{ post.title }}</h1>
         <p class="lead text-muted">
             {{ post.body|linebreaks }}
+          <p>
+          <a href="{% url "blog:post_share" post.id %}">Share this post</a>
+      </p>
         </p>
           <p>Published {{ post.publish }} by {{ post.author }}</p>
             </div>

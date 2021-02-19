@@ -123,3 +123,13 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
     ]
+
+EMAIL_HOST = 'smtp.beget.com'
+EMAIL_HOST_USER = 'test@adressayta.ru'
+EMAIL_HOST_PASSWORD = '123QWERTxyz'
+EMAIL_PORT = 25
+EMAIL_USE_TLS = True
+# Проверка почты
+# python3 manage.py shell
+# >>> from django.core.mail import send_mail
+# >>> send_mail('Django mail', 'This email from django', 'test@adressayta.ru', ['test@adressayta.ru'], fail_silently=False)
