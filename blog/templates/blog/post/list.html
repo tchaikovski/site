@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load blog_tags %}
 {% block title %}
 My Blog
 {% endblock %}
@@ -36,7 +37,7 @@ My Blog
 
             <div class="card-body">
               <p class="card-text">
-              {{ post.body|truncatewords:10|linebreaks }}
+              {{ post.body|markdown|truncatewords_html:10 }}
               </p>
               <div class="d-flex justify-content-between align-items-center">
                 <div class="btn-group">
