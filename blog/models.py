@@ -3,11 +3,16 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.urls import reverse
 from taggit.managers import TaggableManager
+from taggit.models import TaggedItemBase
 
 
 class PublishedManager(models.Manager):
     def get_queryset(self):
         return super(PublishedManager, self).get_queryset().filter(status='published')
+
+
+class TaggedPost(TaggedItemBase):
+    content_object = models.ForeignKey('Post', on_delete=models.CASCADE)
 
 
 class Post(models.Model):
