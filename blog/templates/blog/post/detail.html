@@ -13,6 +13,11 @@
 
             </p>
             <p>Published {{ post.publish }} by {{ post.author }}</p>
+            Похожие статьи:
+            {% for similar in similar_posts %}
+                <a href="{{ similar.get_absolute_url }}">{{ similar.title }}</a>
+            {% endfor %}
+
         </div>
     </div>
 
