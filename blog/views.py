@@ -1,11 +1,44 @@
+from django.contrib.postgres.operations import TrigramExtension
 from django.shortcuts import render, get_object_or_404
 from .models import Post, Comment
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.views.generic import ListView
-from .forms import EmailPostForm, CommentForm
+from .forms import EmailPostForm, CommentForm, SearchForm
 from django.core.mail import send_mail
 from taggit.models import Tag
 from django.db.models import Count
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+from django.contrib.postgres.search import TrigramSimilarity
+
+
+def post_search(request):
+    form = SearchForm()
+    query = None
+    results = []
+    if 'query' in request.GET:
+        form = SearchForm(request.GET)
+        if form.is_valid():
+            query = form.cleaned_data['query']
+            # results = Post.objects.annotate(search=SearchVector('title', 'body'),).filter(search=query)
+            #  Добавляем поиск оп частоте совпадении
+            # search_vector = SearchVector('title', 'body')
+            # Без приоритета тайтла выше
+            search_vector = SearchVector('title', weight='A') + SearchVector('body', weight='B')
+            search_query = SearchQuery(query)
+            # results = Post.objects.annotate(search=search_vector, rank=SearchRank(
+            # search_vector, search_query)).filter(
+            #     search=search_query).order_by('-rank') #  Без приоритета тайтла
+            results = Post.objects.annotate(rank=SearchRank(search_vector, search_query)).filter(
+                rank__gte=0.3).order_by('-rank')
+
+    return render(request, 'blog/post/search.html', {'form': form, 'query': query, 'results': results})
+
+
+# Рейтинг весов от A-D от 1, 0.4, 0,2 и 0,1 - rank__gte=0.3 ограничивает вывод с рангом выше 0,3
+
+
+class TrigramExtensions(TrigramExtension):
+    pass
 
 
 class PostListView(ListView):
@@ -27,8 +60,8 @@ def post_share(request, post_id):
             cd = form.cleaned_data
             # Отправка электронной почты
             post_url = request.build_absolute_uri(post.get_absolute_url())
-            subject = '{} ({}) recommends you reading "{}"' .format(cd['name'], cd['email'], post.title)
-            message = 'Read "{}" at {}\n\n{}\'s comments: {}' .format(post.title, post_url, cd['name'], cd['comments'])
+            subject = '{} ({}) recommends you reading "{}"'.format(cd['name'], cd['email'], post.title)
+            message = 'Read "{}" at {}\n\n{}\'s comments: {}'.format(post.title, post_url, cd['name'], cd['comments'])
             send_mail(subject, message, 'test@adressayta.ru', [cd['to']])
             sent = True
     else:
